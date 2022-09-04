@@ -1,29 +1,35 @@
 package utils
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"os"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func GenerateAccessToken(userId primitive.ObjectID) (string, error) {
-	var err error
-
 	jwtTimeString := os.Getenv("JwtExpireTime")
+	tokenIssuerString := os.Getenv("TokenIssuer")
+	tokenAudienceString := os.Getenv("TokenAudience")
+	jwtSecretString := os.Getenv("JwtSecret")
+
 	jwtTimeDuration, _ := time.ParseDuration(jwtTimeString)
 
 	claims := jwt.MapClaims{}
-	claims["user_id"] = userId
 	claims["exp"] = time.Now().Add(jwtTimeDuration).Unix()
+	claims["iat"] = time.Now().Unix()
+	claims["sub"] = userId
+	claims["iss"] = tokenIssuerString
+	claims["aud"] = tokenAudienceString
+	claims["jti"] = "unique-id"
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err := at.SignedString([]byte(os.Getenv("JwtSecret")))
+	token, err := at.SignedString([]byte(jwtSecretString))
 	if err != nil {
 		return "", err
 	}
 
 	return token, nil
 }
-

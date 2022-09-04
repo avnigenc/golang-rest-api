@@ -1,15 +1,18 @@
 package main
 
 import (
-	"github.com/avnigenc/go-api/controllers"
-	"github.com/avnigenc/go-api/middlewares"
-	"github.com/avnigenc/go-api/modules"
-	"github.com/avnigenc/go-api/shared"
-	"github.com/gin-gonic/gin"
-	"github.com/ilyakaznacheev/cleanenv"
 	"io"
 	"log"
 	"os"
+
+	"github.com/avnigenc/go-api/controllers"
+	"github.com/avnigenc/go-api/endpoint"
+	"github.com/avnigenc/go-api/middlewares"
+	"github.com/avnigenc/go-api/modules"
+	"github.com/avnigenc/go-api/shared"
+
+	"github.com/gin-gonic/gin"
+	"github.com/ilyakaznacheev/cleanenv"
 )
 
 func main() {
@@ -22,36 +25,42 @@ func main() {
 		log.Fatal("config error")
 	}
 
-	// TODO: Refactor handle errors
-	_ = os.Setenv("ServerHost", cfg.ServerHost)
-	_ = os.Setenv("ServerPort", cfg.ServerPort)
-	_ = os.Setenv("DatabaseHost", cfg.DatabaseHost)
-	_ = os.Setenv("DatabasePort", cfg.DatabasePort)
-	_ = os.Setenv("JwtSecret", cfg.JwtSecret)
-	_ = os.Setenv("JwtExpireTime", cfg.JwtExpireTime.String())
+	_ = os.Setenv(shared.ServerHost, cfg.ServerHost)
+	_ = os.Setenv(shared.ServerPort, cfg.ServerPort)
+	_ = os.Setenv(shared.DatabaseHost, cfg.DatabaseHost)
+	_ = os.Setenv(shared.DatabasePort, cfg.DatabasePort)
+	_ = os.Setenv(shared.JwtSecret, cfg.JwtSecret)
+	_ = os.Setenv(shared.TokenIssuer, cfg.TokenIssuer)
+	_ = os.Setenv(shared.TokenAudience, cfg.TokenAudience)
+	_ = os.Setenv(shared.JwtExpireTime, cfg.JwtExpireTime.String())
 
 	router := gin.Default()
 	router.Use(gin.Recovery())
 
 	modules.InitDB()
 
-	publicRoute := router.Group("/api")
-	publicRoute.GET("", controllers.IndexController)
+	// public group
+	publicRoute := router.Group(endpoint.PREFIX)
+
+	// Common
+	publicRoute.GET(endpoint.ROOT, controllers.IndexController)
+	publicRoute.GET(endpoint.HEALTH, controllers.HealthController)
 
 	// Auth
-	authRoute := publicRoute.Group("/auth")
-	authRoute.POST("login", controllers.LoginController)
-	authRoute.POST("register", controllers.RegisterController)
+	authRoute := publicRoute.Group(endpoint.AUTH)
+	authRoute.POST(endpoint.LOGIN, controllers.LoginController)
+	authRoute.POST(endpoint.REGISTER, controllers.RegisterController)
 
-	privateRoute := router.Group("/api", middlewares.TokenHandler)
+	// private group
+	privateRoute := router.Group(endpoint.PREFIX, middlewares.TokenHandler)
+
 	// Users
-	usersRoute := privateRoute.Group("users")
-	usersRoute.GET("", controllers.MeController)
-	usersRoute.PUT("", controllers.UpdateUserController)
+	usersRoute := privateRoute.Group(endpoint.USERS)
+	usersRoute.GET(endpoint.ROOT, controllers.MeController)
+	usersRoute.PUT(endpoint.ROOT, controllers.UpdateUserController)
 
 	err = router.Run(":" + cfg.ServerPort)
 	if err != nil {
-		return 
+		return
 	}
 }
-

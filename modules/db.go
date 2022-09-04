@@ -2,22 +2,23 @@ package modules
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
 	userCollection *mongo.Collection
-	ctx = context.TODO()
+	ctx            = context.TODO()
 )
 
 func InitDB() {
 	host := os.Getenv("DatabaseHost")
 	port := os.Getenv("DatabasePort")
 
-	clientOptions := options.Client().ApplyURI("mongodb://" + host + ":" +  port +"/")
+	clientOptions := options.Client().ApplyURI("mongodb://" + host + ":" + port + "/")
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -31,6 +32,6 @@ func InitDB() {
 	userCollection = client.Database("go-tutor").Collection("users")
 }
 
-func UserCollection() (*mongo.Collection, context.Context)  {
+func UserCollection() (*mongo.Collection, context.Context) {
 	return userCollection, ctx
 }

@@ -4,3 +4,5 @@ ServerHost: localhost
 ServerPort: 8080
 JwtSecret: jdnfksdmfksd
 JwtExpireTime: 6h0m0s
+TokenIssuer: go-rest-api
+TokenAudience: go-rest-api
