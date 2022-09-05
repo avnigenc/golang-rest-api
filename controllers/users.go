@@ -11,9 +11,9 @@ import (
 )
 
 func MeController(c *gin.Context) {
-	userId, _ := c.Get("user_id")
+	userID, _ := c.Get("user_id")
 
-	user, err := services.GetUserById(userId.(string))
+	user, err := services.GetUserById(userID.(string))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, &models.GenericResponse{
 			Result: nil,
@@ -29,7 +29,6 @@ func MeController(c *gin.Context) {
 		},
 		Error: nil,
 	})
-	return
 }
 
 func UpdateUserController(c *gin.Context) {

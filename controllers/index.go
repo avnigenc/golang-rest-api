@@ -13,8 +13,6 @@ func IndexController(c *gin.Context) {
 		Result: "pong",
 		Error:  nil,
 	})
-
-	return
 }
 
 func HealthController(c *gin.Context) {
@@ -25,5 +23,4 @@ func HealthController(c *gin.Context) {
 		},
 		Error: nil,
 	})
-	return
 }

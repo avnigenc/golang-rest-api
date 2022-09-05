@@ -36,7 +36,6 @@ func LoginController(c *gin.Context) {
 		},
 		Error: nil,
 	})
-	return
 }
 
 func RegisterController(c *gin.Context) {
@@ -68,5 +67,4 @@ func RegisterController(c *gin.Context) {
 		},
 		Error: nil,
 	})
-	return
 }

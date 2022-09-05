@@ -6,9 +6,11 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/google/uuid"
 )
 
-func GenerateAccessToken(userId primitive.ObjectID) (string, error) {
+func GenerateAccessToken(userID primitive.ObjectID) (string, error) {
 	jwtTimeString := os.Getenv("JwtExpireTime")
 	tokenIssuerString := os.Getenv("TokenIssuer")
 	tokenAudienceString := os.Getenv("TokenAudience")
@@ -19,10 +21,10 @@ func GenerateAccessToken(userId primitive.ObjectID) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["exp"] = time.Now().Add(jwtTimeDuration).Unix()
 	claims["iat"] = time.Now().Unix()
-	claims["sub"] = userId
+	claims["sub"] = userID
 	claims["iss"] = tokenIssuerString
 	claims["aud"] = tokenAudienceString
-	claims["jti"] = "unique-id"
+	claims["jti"] = uuid.New().String()
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

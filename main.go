@@ -40,24 +40,24 @@ func main() {
 	modules.InitDB()
 
 	// public group
-	publicRoute := router.Group(endpoint.PREFIX)
+	publicRoute := router.Group(endpoint.NamePrefix)
 
 	// Common
-	publicRoute.GET(endpoint.ROOT, controllers.IndexController)
-	publicRoute.GET(endpoint.HEALTH, controllers.HealthController)
+	publicRoute.GET(endpoint.NameRoot, controllers.IndexController)
+	publicRoute.GET(endpoint.NameHealth, controllers.HealthController)
 
 	// Auth
-	authRoute := publicRoute.Group(endpoint.AUTH)
-	authRoute.POST(endpoint.LOGIN, controllers.LoginController)
-	authRoute.POST(endpoint.REGISTER, controllers.RegisterController)
+	authRoute := publicRoute.Group(endpoint.NameAuth)
+	authRoute.POST(endpoint.NameLogin, controllers.LoginController)
+	authRoute.POST(endpoint.NameRegister, controllers.RegisterController)
 
 	// private group
-	privateRoute := router.Group(endpoint.PREFIX, middlewares.TokenHandler)
+	privateRoute := router.Group(endpoint.NamePrefix, middlewares.TokenHandler)
 
 	// Users
-	usersRoute := privateRoute.Group(endpoint.USERS)
-	usersRoute.GET(endpoint.ROOT, controllers.MeController)
-	usersRoute.PUT(endpoint.ROOT, controllers.UpdateUserController)
+	usersRoute := privateRoute.Group(endpoint.NameUsers)
+	usersRoute.GET(endpoint.NameRoot, controllers.MeController)
+	usersRoute.PUT(endpoint.NameRoot, controllers.UpdateUserController)
 
 	err = router.Run(":" + cfg.ServerPort)
 	if err != nil {
